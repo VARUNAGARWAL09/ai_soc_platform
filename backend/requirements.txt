@@ -8,7 +8,7 @@ pydantic-settings
 
 # Machine Learning
 scikit-learn
-tensorflow
+# tensorflow
 numpy
 pandas
 
