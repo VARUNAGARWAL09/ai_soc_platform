@@ -1,0 +1,24 @@
+# FastAPI and Web Framework
+fastapi
+uvicorn[standard]
+python-multipart
+websockets
+pydantic
+pydantic-settings
+
+# Machine Learning
+scikit-learn
+tensorflow
+numpy
+pandas
+
+# Data Processing
+scipy
+
+# PDF Generation
+reportlab
+matplotlib
+
+# Utilities
+python-dateutil
+aiofiles
