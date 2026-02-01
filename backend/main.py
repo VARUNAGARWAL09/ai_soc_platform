@@ -6,9 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
+
 from contextlib import asynccontextmanager
 import numpy as np
 from datetime import datetime
+import os
 
 from config import settings
 from api.routes import dashboard, incidents, logs, threats, automation, chatbot
@@ -31,13 +33,11 @@ explainer = None
 background_task = None
 
 
-async def threat_detection_loop():
-    """Background task for continuous threat detection"""
+async def initialize_components():
+    """Initialize all system components"""
     global telemetry_gen, attack_sim, detector, mitre_mapper, explainer
     
-    print("Starting threat detection loop...")
-    
-    # Initialize components
+    print("Initializing components...")
     telemetry_gen = TelemetryGenerator(num_endpoints=settings.NUM_ENDPOINTS)
     attack_sim = AttackSimulator(telemetry_gen)
     detector = EnsembleDetector()
@@ -46,13 +46,15 @@ async def threat_detection_loop():
     
     # Load models
     try:
-        detector.load_models()
-        print("Models loaded successfully")
+        # On Vercel, we might skip heavy model loading or handle it gracefully
+        if os.getenv("VERCEL"):
+            print("Vercel env detected: Skipping heavy model loading for startup speed")
+        else:
+            detector.load_models()
+            print("Models loaded successfully")
     except Exception as e:
         print(f"Warning: Could not load models: {e}")
-        print("Run trainer.py first to train models")
-        return
-    
+
     # Initialize endpoints
     for endpoint in telemetry_gen.get_endpoint_list():
         ep_metadata = EndpointMetadata(
@@ -65,6 +67,15 @@ async def threat_detection_loop():
             last_seen=datetime.now()
         )
         data_store.update_endpoint(ep_metadata)
+
+
+async def threat_detection_loop():
+    """Background task for continuous threat detection"""
+    # Components should be initialized by now, but we ensure they are
+    if telemetry_gen is None:
+        await initialize_components()
+
+    print("Starting threat detection loop...")
     
     iteration = 0
     
@@ -189,7 +200,13 @@ async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     # Startup
     global background_task
-    background_task = asyncio.create_task(threat_detection_loop())
+    
+    await initialize_components()
+    
+    if os.getenv("VERCEL"):
+        print("Running in Vercel environment - Background simulation loop DISABLED")
+    else:
+        background_task = asyncio.create_task(threat_detection_loop())
     
     yield
     
