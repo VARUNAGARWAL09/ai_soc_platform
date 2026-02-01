@@ -2,15 +2,9 @@
 LSTM-based Sequence Anomaly Detector
 """
 import numpy as np
-try:
-    import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras import layers
-except ImportError:
-    tf = None
-    keras = None
-    layers = None
-
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 from sklearn.preprocessing import StandardScaler
 import pickle
 import os
@@ -32,9 +26,6 @@ class LSTMDetector:
     
     def build_model(self):
         """Build LSTM autoencoder"""
-        if tf is None:
-            return None
-
         # Input
         input_layer = layers.Input(shape=(self.sequence_length, self.input_dim))
         
@@ -91,9 +82,6 @@ class LSTMDetector:
         Returns:
             Training history
         """
-        if tf is None:
-            return {}
-
         # Normalize
         X_train_scaled = self.scaler.fit_transform(X_train)
         
@@ -129,9 +117,6 @@ class LSTMDetector:
     
     def _calculate_threshold(self, X_sequences: np.ndarray):
         """Calculate reconstruction error threshold"""
-        if self.model is None:
-            return
-
         reconstructed = self.model.predict(X_sequences, verbose=0)
         errors = np.mean(np.square(X_sequences - reconstructed), axis=(1, 2))
         
@@ -151,9 +136,6 @@ class LSTMDetector:
         Returns:
             Tuple of (reconstruction_errors, is_anomaly)
         """
-        if tf is None or self.model is None:
-            return np.array([]), np.array([])
-
         X_scaled = self.scaler.transform(X)
         X_sequences = self.create_sequences(X_scaled)
         
@@ -182,9 +164,6 @@ class LSTMDetector:
         if len(errors) == 0:
             return np.array([])
         
-        if self.mean_error is None:
-             return np.zeros(len(errors))
-
         # Z-score normalization
         z_scores = (errors - self.mean_error) / self.std_error
         
@@ -195,9 +174,6 @@ class LSTMDetector:
     
     def save(self, path: str):
         """Save model"""
-        if self.model is None:
-            return
-
         os.makedirs(path, exist_ok=True)
         
         self.model.save(os.path.join(path, 'lstm_model.keras'))
@@ -214,22 +190,16 @@ class LSTMDetector:
     
     def load(self, path: str):
         """Load model"""
-        if tf is None:
-            print("TensorFlow not installed. Skipping LSTM load.")
-            return
-
-        if os.path.exists(os.path.join(path, 'lstm_model.keras')):
-            self.model = keras.models.load_model(os.path.join(path, 'lstm_model.keras'))
+        self.model = keras.models.load_model(os.path.join(path, 'lstm_model.keras'))
         
-        if os.path.exists(os.path.join(path, 'lstm_metadata.pkl')):
-            with open(os.path.join(path, 'lstm_metadata.pkl'), 'rb') as f:
-                metadata = pickle.load(f)
-                self.scaler = metadata['scaler']
-                self.threshold = metadata['threshold']
-                self.mean_error = metadata['mean_error']
-                self.std_error = metadata['std_error']
-                self.input_dim = metadata['input_dim']
-                self.sequence_length = metadata['sequence_length']
+        with open(os.path.join(path, 'lstm_metadata.pkl'), 'rb') as f:
+            metadata = pickle.load(f)
+            self.scaler = metadata['scaler']
+            self.threshold = metadata['threshold']
+            self.mean_error = metadata['mean_error']
+            self.std_error = metadata['std_error']
+            self.input_dim = metadata['input_dim']
+            self.sequence_length = metadata['sequence_length']
 
 
 if __name__ == "__main__":

@@ -2,15 +2,9 @@
 Deep Autoencoder Model for Anomaly Detection
 """
 import numpy as np
-try:
-    import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras import layers
-except ImportError:
-    tf = None
-    keras = None
-    layers = None
-
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 from sklearn.preprocessing import StandardScaler
 import pickle
 import os
@@ -32,10 +26,6 @@ class DeepAutoencoder:
     
     def build_model(self):
         """Build the autoencoder architecture"""
-        if tf is None:
-            print("TensorFlow not installed. Skipping model build.")
-            return None
-
         # Encoder
         input_layer = layers.Input(shape=(self.input_dim,))
         
@@ -83,9 +73,6 @@ class DeepAutoencoder:
         Returns:
             Training history
         """
-        if tf is None:
-            return {}
-
         # Normalize data
         X_train_scaled = self.scaler.fit_transform(X_train)
         
@@ -116,9 +103,6 @@ class DeepAutoencoder:
     
     def _calculate_threshold(self, X: np.ndarray):
         """Calculate anomaly threshold using Z-score"""
-        if self.model is None:
-            return
-
         reconstructed = self.model.predict(X, verbose=0)
         reconstruction_errors = np.mean(np.square(X - reconstructed), axis=1)
         
@@ -139,10 +123,6 @@ class DeepAutoencoder:
         Returns:
             Tuple of (reconstruction_errors, is_anomaly)
         """
-        if tf is None or self.model is None:
-             # Mock behavior for deployment without TF
-            return np.zeros(len(X)), np.zeros(len(X), dtype=bool)
-
         X_scaled = self.scaler.transform(X)
         reconstructed = self.model.predict(X_scaled, verbose=0)
         
@@ -166,9 +146,6 @@ class DeepAutoencoder:
         """
         reconstruction_errors, _ = self.predict(X)
         
-        if self.mean_reconstruction_error is None:
-             return np.zeros(len(X))
-
         # Z-score normalization
         z_scores = (reconstruction_errors - self.mean_reconstruction_error) / self.std_reconstruction_error
         
@@ -179,9 +156,6 @@ class DeepAutoencoder:
     
     def save(self, path: str):
         """Save model and scaler"""
-        if self.model is None:
-            return
-
         os.makedirs(path, exist_ok=True)
         
         # Save Keras model
@@ -199,23 +173,17 @@ class DeepAutoencoder:
     
     def load(self, path: str):
         """Load model and scaler"""
-        if tf is None:
-            print("TensorFlow not installed. Skipping model load.")
-            return
-
         # Load Keras model
-        if os.path.exists(os.path.join(path, 'autoencoder_model.keras')):
-            self.model = keras.models.load_model(os.path.join(path, 'autoencoder_model.keras'))
+        self.model = keras.models.load_model(os.path.join(path, 'autoencoder_model.keras'))
         
         # Load scaler and stats
-        if os.path.exists(os.path.join(path, 'autoencoder_metadata.pkl')):
-            with open(os.path.join(path, 'autoencoder_metadata.pkl'), 'rb') as f:
-                metadata = pickle.load(f)
-                self.scaler = metadata['scaler']
-                self.threshold = metadata['threshold']
-                self.mean_reconstruction_error = metadata['mean_error']
-                self.std_reconstruction_error = metadata['std_error']
-                self.input_dim = metadata['input_dim']
+        with open(os.path.join(path, 'autoencoder_metadata.pkl'), 'rb') as f:
+            metadata = pickle.load(f)
+            self.scaler = metadata['scaler']
+            self.threshold = metadata['threshold']
+            self.mean_reconstruction_error = metadata['mean_error']
+            self.std_reconstruction_error = metadata['std_error']
+            self.input_dim = metadata['input_dim']
 
 
 if __name__ == "__main__":
