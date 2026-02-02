@@ -47,6 +47,7 @@ export default function RootLayout({
                                         <NavLink href="/playbooks">Playbooks</NavLink>
                                         <NavLink href="/forensics">Forensics</NavLink>
                                         <NavLink href="/about">About Team</NavLink>
+                                        <NavLink href="/documentation">Documentation</NavLink>
                                         <div className="pl-4 border-l border-white/10 flex items-center">
                                             <ThemeToggle />
                                         </div>
