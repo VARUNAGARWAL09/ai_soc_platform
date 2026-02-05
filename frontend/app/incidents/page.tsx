@@ -58,20 +58,19 @@ export default function IncidentsPage() {
                     </span>
                 </div>
 
-                {/* Filter Tabs */}
                 <div className="flex bg-gray-200 dark:bg-white/5 p-1 rounded-xl">
                     {filters.map((f) => (
                         <button
                             key={f.id}
                             onClick={() => setFilter(f.id)}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all relative ${filter === f.id ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-150 relative ${filter === f.id ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                                 }`}
                         >
                             {filter === f.id && (
                                 <motion.div
                                     layoutId="filter-pill"
                                     className="absolute inset-0 bg-white dark:bg-white/10 shadow-sm rounded-lg"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    transition={{ type: "spring", bounce: 0.15, duration: 0.3 }}
                                 />
                             )}
                             <span className="relative z-10 flex items-center gap-2">
@@ -98,10 +97,10 @@ export default function IncidentsPage() {
                     {incidents.map((incident, index) => (
                         <motion.div
                             key={incident.id}
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="glass-panel p-8 border-l-4 group relative overflow-hidden transition-all hover:shadow-lg"
+                            transition={{ delay: index * 0.02, duration: 0.2 }}
+                            className="glass-panel p-8 border-l-4 group relative overflow-hidden transition-all duration-150 hover:shadow-lg"
                             style={{ borderLeftColor: getSeverityColorHex(incident.severity) }}
                         >
                             <div className="flex flex-col md:flex-row justify-between gap-8">

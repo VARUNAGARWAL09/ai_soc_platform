@@ -12,22 +12,6 @@ export default function AboutPage() {
             skill: 'Network Forensics',
             stats: { off: 92, def: 88, int: 95 }
         },
-        {
-            name: 'Yuvraj Kumar',
-            role: 'Threat Analyst',
-            initials: 'YK',
-            code: 'INT-02',
-            skill: 'Malware Analysis',
-            stats: { off: 85, def: 94, int: 90 }
-        },
-        {
-            name: 'Ronit Ranjan',
-            role: 'System Architect',
-            initials: 'RR',
-            code: 'ARC-03',
-            skill: 'Cloud Security',
-            stats: { off: 89, def: 91, int: 96 }
-        },
     ]
 
     return (
@@ -46,14 +30,14 @@ export default function AboutPage() {
             </div>
 
             {/* Personnel Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+            <div className="flex justify-center flex-wrap gap-8 px-4">
                 {team.map((member, index) => (
                     <motion.div
                         key={member.name}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.2 }}
-                        className="group relative h-[450px] Perspective-1000"
+                        className="group relative h-[450px] w-full md:w-[350px] Perspective-1000"
                     >
                         {/* Card Container */}
                         <div className="absolute inset-0 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 overflow-hidden transform transition-all duration-500 group-hover:border-cyber-blue/50 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] rounded-xl">

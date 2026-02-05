@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     description: 'Production-grade AI-powered Security Operations Center',
 }
 
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    themeColor: '#0ea5e9',
+}
+
 import AIChatbot from '../components/AIChatbot'
 import ElevenLabsWidget from '../components/ElevenLabsWidget'
 
@@ -75,7 +81,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
     return (
         <Link
             href={href}
-            className="text-gray-300 hover:text-cyber-blue transition-colors duration-200 font-medium"
+            prefetch={true}
+            className="text-gray-300 hover:text-cyber-blue transition-colors duration-150 font-medium"
         >
             {children}
         </Link>
